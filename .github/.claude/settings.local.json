@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp:*)",
+      "Bash(mvn compile:*)",
+      "WebFetch(domain:localhost)",
+      "Bash(curl -s -X POST http://localhost:3001/mcp -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\",\"params\":{}}')",
+      "Bash(curl -s -X POST http://localhost:3001/mcp -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"verify_implementation\",\"arguments\":{\"pattern_name\":\"Composite\"}}}')",
+      "Bash(curl -s -X POST http://localhost:3001/mcp -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"lookup_pattern\",\"arguments\":{\"name\":\"Composite\"}}}')",
+      "Bash(curl -s -X POST http://localhost:3001/mcp -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"verify_implementation\",\"arguments\":{\"pattern_name\":\"Facade\"}}}')",
+      "Bash(curl -s -X POST http://localhost:3001/mcp -H \"Content-Type: application/json\" -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"verify_implementation\",\"arguments\":{\"pattern_name\":\"Decorator\"}}}')"
+    ]
+  }
+}

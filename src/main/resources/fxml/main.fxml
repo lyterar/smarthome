@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import com.smarthome.view.component.Room3DView?>
+<?import com.smarthome.view.component.RoomCanvas?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.smarthome.controller.MainController"
+            stylesheets="@../css/style.css"
+            prefWidth="1200" prefHeight="750">
+
+    <!-- Боковое меню слева -->
+    <left>
+        <VBox prefWidth="280" styleClass="side-panel" spacing="8">
+            <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+
+            <Label text="УМНЫЙ ДОМ" styleClass="app-title"/>
+
+            <!-- Переключатель режимов вида -->
+            <HBox spacing="6">
+                <Button text="2D" onAction="#onSwitch2D" styleClass="btn-secondary"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button text="3D" onAction="#onSwitch3D" styleClass="btn-secondary"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button text="FPS" onAction="#onSwitchFps" styleClass="btn-secondary"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+            </HBox>
+
+            <Separator/>
+
+            <Label text="Комнаты" styleClass="panel-title"/>
+            <ListView fx:id="roomListView" prefHeight="155" styleClass="dark-list"/>
+
+            <HBox spacing="6">
+                <Button text="+ Комната" onAction="#onAddRoom" styleClass="btn-primary"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button text="−" onAction="#onRemoveRoom" styleClass="btn-danger" prefWidth="36"/>
+            </HBox>
+
+            <Separator/>
+
+            <Label text="Устройства" styleClass="panel-title"/>
+            <ListView fx:id="deviceListView" prefHeight="130" styleClass="dark-list"/>
+
+            <HBox spacing="6">
+                <Button text="+ Устройство" onAction="#onAddDevice" styleClass="btn-primary"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button text="−" onAction="#onRemoveDevice" styleClass="btn-danger" prefWidth="36"/>
+            </HBox>
+
+            <Button text="Вкл / Выкл" onAction="#onToggleDevice" styleClass="btn-toggle"
+                    maxWidth="Infinity"/>
+            <HBox spacing="6">
+                <Button text="Логирование" onAction="#onEnableLogging" styleClass="btn-secondary"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button text="+ Группа" onAction="#onCreateGroup" styleClass="btn-secondary"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+            </HBox>
+
+            <Separator/>
+
+            <Label text="Автоматизация" styleClass="panel-title"/>
+            <ComboBox fx:id="automationCombo" promptText="Выбрать режим" maxWidth="Infinity"/>
+            <Button text="Применить" onAction="#onApplyAutomation" styleClass="btn-secondary"
+                    maxWidth="Infinity"/>
+
+            <Separator/>
+
+            <HBox spacing="6">
+                <Button fx:id="undoButton" text="Отмена" onAction="#onUndo"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button fx:id="redoButton" text="Повтор" onAction="#onRedo"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+            </HBox>
+
+            <HBox spacing="6">
+                <Button text="Сохранить" onAction="#onSaveHouse" styleClass="btn-secondary"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button text="Загрузить" onAction="#onLoadHouse" styleClass="btn-secondary"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+            </HBox>
+
+            <Separator/>
+
+            <Label fx:id="houseInfoLabel" text="0 комнат" styleClass="house-info" wrapText="true"/>
+        </VBox>
+    </left>
+
+    <!-- Центр: 2D или 3D вид (переключаются через visible) -->
+    <center>
+        <StackPane>
+            <RoomCanvas fx:id="roomCanvas" visible="false"/>
+            <Room3DView fx:id="room3DView"/>
+        </StackPane>
+    </center>
+
+    <!-- Статусная строка -->
+    <bottom>
+        <HBox styleClass="status-bar" alignment="CENTER_LEFT">
+            <padding><Insets top="5" right="10" bottom="5" left="10"/></padding>
+            <Label fx:id="statusLabel" text="Готово"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

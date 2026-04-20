@@ -1,0 +1,175 @@
+/* === Тёмная тема === */
+
+.root {
+    -fx-font-family: "System";
+    -fx-font-size: 13px;
+    -fx-background-color: #1a1a2e;
+}
+
+/* === Боковая панель === */
+
+.side-panel {
+    -fx-background-color: #1e1e2e;
+    -fx-border-color: #3a3a5c;
+    -fx-border-width: 0 1 0 0;
+}
+
+.app-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #9090ff;
+    -fx-padding: 0 0 4 0;
+}
+
+.panel-title {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #7777aa;
+    -fx-padding: 2 0 1 0;
+}
+
+/* === Кнопки (базовый стиль) === */
+
+.button {
+    -fx-background-color: #2a2a4a;
+    -fx-text-fill: #ccccff;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 6 8;
+}
+
+.button:hover {
+    -fx-background-color: #3a3a6a;
+}
+
+.button:disabled {
+    -fx-opacity: 0.4;
+}
+
+.btn-primary {
+    -fx-background-color: #1e4d9a;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 6 8;
+}
+
+.btn-primary:hover {
+    -fx-background-color: #2860bb;
+}
+
+.btn-danger {
+    -fx-background-color: #8b1a1a;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 6 8;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #aa2222;
+}
+
+.btn-toggle {
+    -fx-background-color: #7a4d00;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 6 8;
+}
+
+.btn-toggle:hover {
+    -fx-background-color: #996600;
+}
+
+.btn-secondary {
+    -fx-background-color: #2a3a55;
+    -fx-text-fill: #bbccee;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 6 8;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #3a4d70;
+}
+
+/* === Списки === */
+
+.dark-list {
+    -fx-background-color: #141428;
+    -fx-border-color: #3a3a5c;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 2;
+}
+
+.dark-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #aaaacc;
+    -fx-padding: 4 6;
+    -fx-font-size: 12px;
+}
+
+.dark-list .list-cell:filled:selected {
+    -fx-background-color: #1e4d9a;
+    -fx-text-fill: white;
+}
+
+.dark-list .list-cell:filled:hover {
+    -fx-background-color: #252545;
+}
+
+/* === ComboBox === */
+
+.combo-box {
+    -fx-background-color: #2a2a4a;
+    -fx-border-color: #4a4a7a;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #ccccff;
+    -fx-background-color: transparent;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #2a2a4a;
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: #2a2a4a;
+    -fx-text-fill: #ccccff;
+}
+
+.combo-box-popup .list-cell:filled:hover {
+    -fx-background-color: #3a3a6a;
+}
+
+/* === Разделитель === */
+
+.separator .line {
+    -fx-border-color: #3a3a5c;
+}
+
+/* === Статусная строка === */
+
+.status-bar {
+    -fx-background-color: #111122;
+    -fx-border-color: #3a3a5c;
+    -fx-border-width: 1 0 0 0;
+}
+
+.status-bar .label {
+    -fx-text-fill: #6666aa;
+    -fx-font-size: 12px;
+}
+
+/* === Информация о доме === */
+
+.house-info {
+    -fx-font-size: 11px;
+    -fx-text-fill: #5555aa;
+    -fx-padding: 2 0 0 0;
+}

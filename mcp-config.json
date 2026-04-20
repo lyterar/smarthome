@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "smart-home": {
+      "url": "http://localhost:3001/mcp",
+      "description": "Smart Home MCP Server — управление умным домом + справочник GoF паттернов из книги",
+      "tools": [
+        "get_patterns",
+        "list_devices",
+        "control_device",
+        "list_rooms",
+        "get_house_status",
+        "lookup_pattern",
+        "list_all_gof_patterns",
+        "search_patterns_by_category",
+        "get_pattern_participants",
+        "verify_implementation",
+        "get_pattern_applicability",
+        "compare_patterns"
+      ]
+    }
+  }
+}
