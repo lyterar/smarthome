@@ -12,20 +12,88 @@ import javafx.scene.shape.Sphere;
 
 /**
  * Фабрика 3D моделей устройств.
- * Создаёт 3D объект по DeviceType и состоянию устройства.
+ *
+ * ПРИЧИНА: Устройства отображались только геометрическими примитивами →
+ *          выглядело как прототип, не как готовый продукт.
+ * СЛЕДСТВИЕ: Теперь сначала пробуем загрузить реальную 3D модель из OBJ-файла.
+ *            Если OBJ отсутствует — автоматически используется примитив.
+ *            Замена OBJ не требует правок кода — достаточно добавить файл
+ *            в resources/models/.
+ *
+ * GoF паттерн: Factory Method.
+ *   createModel() — фабричный метод, скрывающий выбор между OBJ и примитивом.
+ *   ObjModelLoader.load() — вложенный Factory Method для OBJ.
+ *
+ * Соглашение по именам OBJ: DeviceType.name().toLowerCase()
+ *   LIGHT      → resources/models/light.obj
+ *   THERMOSTAT → resources/models/thermostat.obj
+ *   SENSOR     → resources/models/sensor.obj
+ *   LOCK       → resources/models/lock.obj
+ *   CAMERA     → resources/models/camera.obj
+ *   SPEAKER    → resources/models/speaker.obj
  */
 public class Device3DModel {
 
+    /**
+     * Создаёт 3D модель устройства.
+     *
+     * ПРИЧИНА: нужна единая точка входа для создания любой модели устройства.
+     * СЛЕДСТВИЕ: вызывающий код не знает, OBJ это или примитив —
+     *            переключение прозрачно при добавлении OBJ-файла.
+     *
+     * @param type  тип устройства
+     * @param isOn  текущее состояние (влияет на цвет)
+     * @return      Group с 3D представлением
+     */
     public static Group createModel(DeviceType type, boolean isOn) {
+        // Имя OBJ совпадает с именем типа в нижнем регистре
+        String modelName = type.name().toLowerCase();
+
+        // Пытаемся загрузить OBJ-модель с цветом состояния
+        Color stateColor = getStateColor(type, isOn);
+        Group objModel = ObjModelLoader.load(modelName, 1.0, stateColor);
+
+        if (objModel \!= null) {
+            // OBJ успешно загружен — добавляем свет для лампы
+            if (type == DeviceType.LIGHT && isOn) {
+                PointLight glow = new PointLight(Color.LIGHTYELLOW);
+                objModel.getChildren().add(glow);
+            }
+            return objModel;
+        }
+
+        // Fallback: геометрические примитивы (если OBJ не найден)
         return switch (type) {
-            case LIGHT     -> createLamp(isOn);
+            case LIGHT      -> createLamp(isOn);
             case THERMOSTAT -> createThermostat(isOn);
-            case SENSOR    -> createSensor(isOn);
-            case LOCK      -> createLock(isOn);
-            case CAMERA    -> createCamera();
-            case SPEAKER   -> createSpeaker();
+            case SENSOR     -> createSensor(isOn);
+            case LOCK       -> createLock(isOn);
+            case CAMERA     -> createCamera();
+            case SPEAKER    -> createSpeaker();
         };
     }
+
+    /**
+     * Возвращает цвет, соответствующий типу и состоянию устройства.
+     *
+     * ПРИЧИНА: OBJ-модель без контекста состояния — всегда серая.
+     * СЛЕДСТВИЕ: единый метод определяет смысловой цвет (вкл/выкл)
+     *            и для OBJ, и для примитивов — нет дублирования логики.
+     */
+    private static Color getStateColor(DeviceType type, boolean isOn) {
+        return switch (type) {
+            case LIGHT      -> isOn ? Color.YELLOW : Color.DARKGRAY;
+            case THERMOSTAT -> isOn ? Color.TOMATO : Color.CORNFLOWERBLUE;
+            case SENSOR     -> isOn ? Color.LIMEGREEN : Color.DIMGRAY;
+            case LOCK       -> isOn ? Color.LIMEGREEN : Color.TOMATO;
+            case CAMERA     -> Color.DARKGRAY;
+            case SPEAKER    -> Color.SLATEGRAY;
+        };
+    }
+
+    // =========================================================
+    //  Примитивы (fallback если OBJ не найден)
+    // =========================================================
 
     /** Лампа: цилиндр (ножка) + сфера (плафон), жёлтая если ON */
     private static Group createLamp(boolean isOn) {
@@ -41,7 +109,7 @@ public class Device3DModel {
 
         g.getChildren().addAll(stand, bulb);
 
-        // Включённая лампа светится
+        // Включённая лампа излучает свет
         if (isOn) {
             PointLight glow = new PointLight(Color.LIGHTYELLOW);
             glow.setTranslateY(-19);
@@ -70,7 +138,7 @@ public class Device3DModel {
         return g;
     }
 
-    /** Замок: прямоугольный корпус + дужка (красный=заблокирован, зелёный=разблокирован) */
+    /** Замок: прямоугольный корпус + дужка */
     private static Group createLock(boolean isOn) {
         Group g = new Group();
 

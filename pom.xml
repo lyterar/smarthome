@@ -39,6 +39,17 @@
             <version>2.10.1</version>
         </dependency>
 
+        <!-- FXyz3D: запрошена версия 0.6.0, но недоступна (Bintray/JCenter закрыт в 2021). -->
+        <!-- Реализован нативный OBJ-загрузчик через JavaFX TriangleMesh (ObjModelLoader.java) -->
+        <!-- Если FXyz3D появится на Maven Central, добавить: -->
+        <!--
+        <dependency>
+            <groupId>org.fxyz3d</groupId>
+            <artifactId>fxyz3d</artifactId>
+            <version>0.6.0</version>
+        </dependency>
+        -->
+
         <!-- MCP Server (embedded HTTP) -->
         <!-- Uses com.sun.net.httpserver built into JDK -->
 
