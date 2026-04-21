@@ -1,6 +1,6 @@
 # Smart Home 3D UI — Прогресс разработки
 
-## Текущий шаг: 2 (FPS движение как в игре)
+## Текущий шаг: 3 (Смена темы — Strategy)
 
 ## Завершённые шаги
 
@@ -25,10 +25,34 @@
 
 ---
 
+### ✅ ШАГ 2 — FPS движение как в игре
+**Дата:** 2026-04-21  
+**Причина:** базовый FPS без инерции и коллизий → движение казалось скользящим и неестественным.  
+**Следствие:** добавлены инерция (lerp), коллизии со стенами, бег (Shift), боббинг камеры,
+               захват мыши (Cursor.NONE), прицел (Canvas overlay).
+
+**Изменённые файлы:**
+- `src/main/java/com/smarthome/view/component/FpsCameraController.java` — полный рефакторинг
+- `src/main/java/com/smarthome/view/component/Room3DView.java` — Canvas-прицел + передача bounds
+
+**Детали реализации:**
+- Инерция: lerp текущей скорости к целевой (коэф. 0.15 + адаптация к dt)
+- Коллизии: setRoomBounds() передаёт AABB комнаты → clamp позиции при каждом кадре
+- Бег (Shift): множитель 2.2× скорости
+- Боббинг: Math.sin(walkTime * 8) * 2.5 по оси Y playerGroup
+- Прицел: Canvas поверх SubScene, mouseTransparent=true, крест с окантовкой
+- Захват мыши: setCursor(Cursor.NONE) при attach, DEFAULT при detach
+- setOnMouseMoved: поворот камеры без зажатой кнопки (как в настоящем FPS)
+- AnimationTimer с dt в секундах (защита от лагспайков > 0.05с)
+
+**GoF паттерн:**
+  Strategy — FpsCameraController и CameraController взаимозаменяемы через attach/detach
+
+---
+
 ## Очередь
 
-- [ ] ШАГ 2 — FPS движение как в игре (инерция, коллизии, бег, прицел)
-- [ ] ШАГ 3 — Смена темы (Strategy)
+- [ ] ШАГ 3 — Смена темы (dark/light/blue) — паттерн Strategy
 - [ ] ШАГ 4 — Мультиоконный интерфейс
 - [ ] ШАГ 5 — Текстуры комнат
 - [ ] ШАГ 6 — Анимации

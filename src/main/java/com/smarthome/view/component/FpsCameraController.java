@@ -1,82 +1,111 @@
 package com.smarthome.view.component;
 
 import javafx.animation.AnimationTimer;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SubScene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.transform.Rotate;
 
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * FPS-камера: игрок стоит внутри комнаты и вращает головой.
+ * Улучшенный FPS-контроллер камеры (Шаг 2).
  *
- * Иерархия объектов:
- *   playerGroup (translateX, translateZ — позиция в мире)
- *     └─ yawGroup   (Rotate Y_AXIS — поворот головы влево/вправо)
- *          └─ pitchGroup (Rotate X_AXIS — наклон вверх/вниз)
- *               └─ camera (translateZ = 0, translateY = 0)
+ * Причина: базовый FPS без инерции и коллизий — движение неестественное.
+ * Следствие: добавлены инерция, коллизии, бег, боббинг, захват мыши.
+ *
+ * Иерархия:
+ *   playerGroup (translateX/Z — позиция)
+ *     └─ yawGroup   (Rotate Y — поворот влево/вправо)
+ *          └─ pitchGroup (Rotate X — наклон вверх/вниз)
+ *               └─ camera
  */
 public class FpsCameraController {
 
-    private static final double SPEED = 5.0;
-    // Уровень глаз относительно пола (Y = 0)
-    private static final double EYE_LEVEL_Y = -50.0;
+    // Базовая скорость (юнит/кадр при 60fps)
+    private static final double SPEED        = 3.5;
+    // Множитель бега (Shift)
+    private static final double SPRINT_MULT  = 2.2;
+    // Коэффициент инерции (lerp): меньше = резче
+    private static final double INERTIA      = 0.15;
+    // Уровень глаз (Y отрицательный = выше пола)
+    private static final double EYE_LEVEL_Y  = -50.0;
+    // Амплитуда и частота боббинга
+    private static final double BOB_AMP      = 2.5;
+    private static final double BOB_FREQ     = 8.0;
+    // Порог скорости для включения боббинга
+    private static final double BOB_THRESH   = 0.3;
+    // Отступ от стены при коллизии
+    private static final double WALL_MARGIN  = 14.0;
 
-    // Группа позиции игрока в мире
+    // Иерархия групп
     final Group playerGroup = new Group();
-
-    // Вращение вокруг оси Y — «рыскание» (поворот влево/вправо)
-    private final Rotate yawRotate = new Rotate(0, Rotate.Y_AXIS);
-    private final Group yawGroup = new Group();
-
-    // Вращение вокруг оси X — «тангаж» (наклон вверх/вниз)
+    private final Rotate yawRotate   = new Rotate(0, Rotate.Y_AXIS);
+    private final Group  yawGroup    = new Group();
     private final Rotate pitchRotate = new Rotate(0, Rotate.X_AXIS);
-    private final Group pitchGroup = new Group();
+    private final Group  pitchGroup  = new Group();
 
-    // Текущие углы в градусах
-    private double yaw = 0;
+    // Состояние камеры
+    private double yaw   = 0;
     private double pitch = 0;
 
-    // Нажатые клавиши
+    // Инерция: текущий вектор скорости
+    private double velX = 0;
+    private double velZ = 0;
+
+    // Время боббинга
+    private double walkTime = 0;
+
+    // Границы комнаты для коллизий
+    private double roomMinX = -Double.MAX_VALUE;
+    private double roomMaxX =  Double.MAX_VALUE;
+    private double roomMinZ = -Double.MAX_VALUE;
+    private double roomMaxZ =  Double.MAX_VALUE;
+
+    // Ввод
     private final Set<String> pressedKeys = new HashSet<>();
+    private double lastMouseX = -1;
+    private double lastMouseY = -1;
 
-    // AnimationTimer для плавного движения
+    // Обработчики
+    private javafx.event.EventHandler<MouseEvent> mousePressHandler;
+    private javafx.event.EventHandler<MouseEvent> mouseMoveHandler;
+    private javafx.event.EventHandler<KeyEvent>   keyPressHandler;
+    private javafx.event.EventHandler<KeyEvent>   keyReleaseHandler;
+
     private AnimationTimer movementTimer;
-
-    // Callback для выхода из FPS-режима (вызывается по ESC)
-    private Runnable onExit;
-
-    // Координаты мыши при последнем событии
-    private double lastMouseX;
-    private double lastMouseY;
-
-    // Обработчики, которые надо снять при detach
-    private javafx.event.EventHandler<javafx.scene.input.MouseEvent> mousePressHandler;
-    private javafx.event.EventHandler<javafx.scene.input.MouseEvent> mouseDragHandler;
-    private javafx.event.EventHandler<javafx.scene.input.KeyEvent> keyPressHandler;
-    private javafx.event.EventHandler<javafx.scene.input.KeyEvent> keyReleaseHandler;
+    private final Runnable onExit;
 
     public FpsCameraController(PerspectiveCamera camera, Runnable onExit) {
         this.onExit = onExit;
 
-        // Собираем иерархию групп
+        // Причина: иерархия групп = независимые оси вращения (gimbal lock минимизирован)
         yawGroup.getTransforms().add(yawRotate);
         pitchGroup.getTransforms().add(pitchRotate);
-
         pitchGroup.getChildren().add(camera);
         yawGroup.getChildren().add(pitchGroup);
         playerGroup.getChildren().add(yawGroup);
-
-        // Уровень глаз
         playerGroup.setTranslateY(EYE_LEVEL_Y);
     }
 
     /**
-     * Устанавливает позицию спауна игрока в мировых координатах.
-     * Y головы фиксирован на уровне глаз.
+     * Задаёт границы комнаты для коллизий.
+     * Причина: без границ игрок вылетает за стены.
+     * Следствие: позиция ограничена внутри комнаты.
      */
+    public void setRoomBounds(double centerX, double centerZ, double width, double depth) {
+        roomMinX = centerX - width  / 2.0 + WALL_MARGIN;
+        roomMaxX = centerX + width  / 2.0 - WALL_MARGIN;
+        roomMinZ = centerZ - depth  / 2.0 + WALL_MARGIN;
+        roomMaxZ = centerZ + depth  / 2.0 - WALL_MARGIN;
+    }
+
+    /** Устанавливает начальную позицию игрока (Y = уровень глаз). */
     public void spawnAt(double x, double y, double z) {
         playerGroup.setTranslateX(x);
         playerGroup.setTranslateY(EYE_LEVEL_Y);
@@ -84,141 +113,188 @@ public class FpsCameraController {
     }
 
     /**
-     * Подключает все обработчики к SubScene и запускает таймер движения.
+     * Подключает обработчики к SubScene и запускает таймер движения.
+     * Причина: метод attach/detach = паттерн Strategy — контроллер сменяем.
      */
-    public void attach(SubScene scene) {
+    public void attach(SubScene subScene) {
         pressedKeys.clear();
+        lastMouseX = -1;
+        lastMouseY = -1;
+        velX = 0;
+        velZ = 0;
 
-        // --- Обработчик нажатия мыши (запоминаем позицию) ---
+        // Захват мыши: скрываем курсор в FPS-режиме
+        // Причина: курсор отвлекает от прицела
+        // Следствие: взгляд управляется движением мыши без визуального курсора
+        if (subScene.getScene() \!= null) {
+            subScene.getScene().setCursor(Cursor.NONE);
+        }
+
         mousePressHandler = e -> {
             lastMouseX = e.getSceneX();
             lastMouseY = e.getSceneY();
         };
 
-        // --- Обработчик перемещения мыши (вращение головы) ---
-        mouseDragHandler = e -> {
+        // Причина: setOnMouseMoved работает без зажатой кнопки — удобнее
+        // Следствие: взгляд поворачивается свободным движением мыши
+        mouseMoveHandler = e -> {
+            if (lastMouseX < 0) {
+                lastMouseX = e.getSceneX();
+                lastMouseY = e.getSceneY();
+                return;
+            }
             double dx = e.getSceneX() - lastMouseX;
             double dy = e.getSceneY() - lastMouseY;
-
-            // Поворот головы влево/вправо
-            yaw += dx * 0.3;
+            yaw += dx * 0.25;
             yawRotate.setAngle(yaw);
-
-            // Наклон вверх/вниз с ограничением
-            pitch = clamp(pitch - dy * 0.3, -80, 80);
+            pitch = clamp(pitch - dy * 0.25, -80, 80);
             pitchRotate.setAngle(pitch);
-
             lastMouseX = e.getSceneX();
             lastMouseY = e.getSceneY();
         };
 
-        // --- Обработчик нажатия клавиш ---
         keyPressHandler = e -> {
-            String code = e.getCode().getName();
-            pressedKeys.add(code);
-
-            // ESC — выход из FPS режима
-            if (e.getCode() == javafx.scene.input.KeyCode.ESCAPE && onExit != null) {
+            pressedKeys.add(e.getCode().getName());
+            // ESC: выход в Orbit-режим
+            if (e.getCode() == KeyCode.ESCAPE && onExit \!= null) {
                 onExit.run();
             }
         };
 
-        // --- Обработчик отпускания клавиш ---
         keyReleaseHandler = e -> pressedKeys.remove(e.getCode().getName());
 
-        scene.setOnMousePressed(mousePressHandler);
-        scene.setOnMouseDragged(mouseDragHandler);
+        subScene.setOnMousePressed(mousePressHandler);
+        subScene.setOnMouseMoved(mouseMoveHandler);
+        subScene.setOnMouseDragged(mouseMoveHandler);
 
-        // Клавиши слушаем на уровне сцены (не SubScene)
-        if (scene.getScene() != null) {
-            scene.getScene().setOnKeyPressed(keyPressHandler);
-            scene.getScene().setOnKeyReleased(keyReleaseHandler);
+        // Клавиши слушаем на уровне Scene (SubScene не фокусируется)
+        if (subScene.getScene() \!= null) {
+            subScene.getScene().setOnKeyPressed(keyPressHandler);
+            subScene.getScene().setOnKeyReleased(keyReleaseHandler);
         } else {
-            // Если сцена ещё не добавлена в Scene — подписываемся при появлении
-            scene.sceneProperty().addListener((obs, oldScene, newScene) -> {
-                if (newScene != null) {
+            subScene.sceneProperty().addListener((obs, old, newScene) -> {
+                if (newScene \!= null) {
                     newScene.setOnKeyPressed(keyPressHandler);
                     newScene.setOnKeyReleased(keyReleaseHandler);
+                    newScene.setCursor(Cursor.NONE);
                 }
             });
         }
 
-        // --- AnimationTimer для плавного движения при зажатых клавишах ---
+        // Причина: AnimationTimer синхронизирован с JavaFX render-loop
+        // Следствие: движение плавное, нет рывков (не зависит от Thread.sleep)
         movementTimer = new AnimationTimer() {
+            private long lastNano = 0;
             @Override
             public void handle(long now) {
-                processMovement();
+                double dt = lastNano == 0 ? 0.016 : Math.min((now - lastNano) / 1_000_000_000.0, 0.05);
+                lastNano = now;
+                processMovement(dt);
             }
         };
         movementTimer.start();
     }
 
-    /**
-     * Отключает все обработчики и останавливает таймер движения.
-     */
-    public void detach(SubScene scene) {
-        // Останавливаем таймер
-        if (movementTimer != null) {
+    /** Отключает обработчики и останавливает таймер. */
+    public void detach(SubScene subScene) {
+        if (movementTimer \!= null) {
             movementTimer.stop();
             movementTimer = null;
         }
 
-        // Снимаем обработчики с SubScene
-        scene.setOnMousePressed(null);
-        scene.setOnMouseDragged(null);
+        subScene.setOnMousePressed(null);
+        subScene.setOnMouseMoved(null);
+        subScene.setOnMouseDragged(null);
 
-        // Снимаем обработчики клавиш с JavaFX Scene
-        if (scene.getScene() != null) {
-            scene.getScene().setOnKeyPressed(null);
-            scene.getScene().setOnKeyReleased(null);
+        // Возвращаем курсор и снимаем клавишные обработчики
+        if (subScene.getScene() \!= null) {
+            subScene.getScene().setCursor(Cursor.DEFAULT);
+            subScene.getScene().setOnKeyPressed(null);
+            subScene.getScene().setOnKeyReleased(null);
         }
 
         pressedKeys.clear();
+        velX = 0;
+        velZ = 0;
     }
 
-    /**
-     * Обрабатывает нажатые клавиши и перемещает игрока.
-     * W/S — вперёд/назад, A/D — стрейф.
-     */
-    private void processMovement() {
-        // Угол yaw в радианах для вычисления направления
-        double yawRad = Math.toRadians(yaw);
-
-        double moveX = 0;
-        double moveZ = 0;
-
-        if (pressedKeys.contains("W")) {
-            // Вперёд: direction = (sin(yaw), cos(yaw)) в плоскости XZ
-            moveX += Math.sin(yawRad) * SPEED;
-            moveZ += Math.cos(yawRad) * SPEED;
-        }
-        if (pressedKeys.contains("S")) {
-            // Назад
-            moveX -= Math.sin(yawRad) * SPEED;
-            moveZ -= Math.cos(yawRad) * SPEED;
-        }
-        if (pressedKeys.contains("A")) {
-            // Стрейф влево: перпендикуляр к направлению = (cos(yaw), -sin(yaw))
-            moveX -= Math.cos(yawRad) * SPEED;
-            moveZ += Math.sin(yawRad) * SPEED;
-        }
-        if (pressedKeys.contains("D")) {
-            // Стрейф вправо
-            moveX += Math.cos(yawRad) * SPEED;
-            moveZ -= Math.sin(yawRad) * SPEED;
-        }
-
-        playerGroup.setTranslateX(playerGroup.getTranslateX() + moveX);
-        playerGroup.setTranslateZ(playerGroup.getTranslateZ() + moveZ);
-    }
-
-    /** Зажимает значение между min и max */
-    private double clamp(double value, double min, double max) {
-        return Math.max(min, Math.min(max, value));
-    }
-
-    /** Возвращает группу игрока для добавления в сцену */
+    /** Возвращает корневую группу игрока (добавляется в 3D-сцену). */
     public Group getPlayerGroup() {
         return playerGroup;
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // Приватная логика движения
+    // ────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Петля движения: инерция → позиция → коллизии → боббинг.
+     * Вызывается каждый кадр из AnimationTimer.
+     */
+    private void processMovement(double dt) {
+        double yawRad = Math.toRadians(yaw);
+
+        // Бег: Shift удваивает скорость
+        // Причина: одна скорость монотонна — нет тактического выбора
+        // Следствие: два режима скорости дают ощущение темпа
+        boolean sprinting = pressedKeys.contains("Shift");
+        double  speed     = SPEED * (sprinting ? SPRINT_MULT : 1.0);
+
+        // Целевой вектор скорости по WASD
+        double targetVX = 0, targetVZ = 0;
+        if (pressedKeys.contains("W")) {
+            targetVX += Math.sin(yawRad) * speed;
+            targetVZ += Math.cos(yawRad) * speed;
+        }
+        if (pressedKeys.contains("S")) {
+            targetVX -= Math.sin(yawRad) * speed;
+            targetVZ -= Math.cos(yawRad) * speed;
+        }
+        if (pressedKeys.contains("A")) {
+            targetVX -= Math.cos(yawRad) * speed;
+            targetVZ += Math.sin(yawRad) * speed;
+        }
+        if (pressedKeys.contains("D")) {
+            targetVX += Math.cos(yawRad) * speed;
+            targetVZ -= Math.sin(yawRad) * speed;
+        }
+
+        // Инерция: lerp текущей скорости к целевой
+        // Причина: мгновенный старт/стоп нереалистичен
+        // Следствие: скорость плавно нарастает и затухает, как у живого персонажа
+        double t = clamp(INERTIA + dt * 2.5, 0.01, 1.0);
+        velX += (targetVX - velX) * t;
+        velZ += (targetVZ - velZ) * t;
+
+        // Позиция (нормировано к 60fps для стабильности при разных частотах)
+        double newX = playerGroup.getTranslateX() + velX * dt * 60;
+        double newZ = playerGroup.getTranslateZ() + velZ * dt * 60;
+
+        // Коллизии: ограничиваем позицию в границах комнаты
+        // Причина: без стоп-условия игрок видит закулисье сцены
+        // Следствие: невидимый барьер у каждой стены останавливает игрока
+        newX = clamp(newX, roomMinX, roomMaxX);
+        newZ = clamp(newZ, roomMinZ, roomMaxZ);
+
+        playerGroup.setTranslateX(newX);
+        playerGroup.setTranslateZ(newZ);
+
+        // Боббинг камеры при ходьбе
+        // Причина: ровная камера — «мёртвый» взгляд, нет тактильного ощущения
+        // Следствие: синус добавляет «вес» шагам, пространство оживает
+        boolean moving = Math.abs(velX) > BOB_THRESH || Math.abs(velZ) > BOB_THRESH;
+        if (moving) {
+            walkTime += dt * BOB_FREQ * (sprinting ? 1.4 : 1.0);
+            double bob = Math.sin(walkTime) * BOB_AMP;
+            playerGroup.setTranslateY(EYE_LEVEL_Y + bob);
+        } else {
+            // Плавный возврат к базовому уровню глаз
+            double curY = playerGroup.getTranslateY();
+            playerGroup.setTranslateY(curY + (EYE_LEVEL_Y - curY) * 0.12);
+        }
+    }
+
+    private double clamp(double v, double min, double max) {
+        return Math.max(min, Math.min(max, v));
     }
 }
