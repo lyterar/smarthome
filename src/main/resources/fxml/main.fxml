@@ -99,6 +99,16 @@
 
             <Separator/>
 
+            <!-- Кнопки окон (Шаг 4 — Мультиоконный интерфейс) -->
+            <!-- Причина: окна автоматизации и лога надо как-то открывать -->
+            <!-- Следствие: две кнопки в боковой панели -->
+            <HBox spacing="6">
+                <Button text="Автоматизация" onAction="#onOpenAutomationWindow"
+                        styleClass="btn-secondary" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button text="Журнал" onAction="#onOpenLogWindow"
+                        styleClass="btn-secondary" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+            </HBox>
+
             <Label fx:id="houseInfoLabel" text="0 комнат" styleClass="house-info" wrapText="true"/>
         </VBox>
     </left>

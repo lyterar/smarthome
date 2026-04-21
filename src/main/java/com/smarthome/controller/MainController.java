@@ -17,6 +17,9 @@ import com.smarthome.view.component.RoomCanvas;
 import com.smarthome.view.dialog.AddDeviceDialog;
 import com.smarthome.view.dialog.AddRoomDialog;
 import com.smarthome.view.dialog.CreateGroupDialog;
+import com.smarthome.view.window.AutomationWindow;
+import com.smarthome.view.window.DeviceDetailWindow;
+import com.smarthome.view.window.LogWindow;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -65,6 +68,13 @@ public class MainController {
     private ObservableList<Device> deviceItems = FXCollections.observableArrayList();
     private Room selectedRoom;
 
+    // --- Немодальные окна (Шаг 4) ---
+    // Причина: создаём один раз и переиспользуем — не создаём при каждом открытии
+    // Следствие: окна сохраняют историю и состояние между открытиями
+    private AutomationWindow automationWindow;
+    private DeviceDetailWindow deviceDetailWindow;
+    private LogWindow logWindow;
+
     @FXML
     public void initialize() {
         facade = new SmartHomeFacade();
@@ -77,6 +87,7 @@ public class MainController {
         setupDeviceList();
         setupAutomation();
         setupEventListeners();
+        initWindows();
         updateStatus("Готово");
         refreshAll();
     }
@@ -96,8 +107,29 @@ public class MainController {
                 (obs, oldVal, newVal) -> onRoomSelected(newVal));
     }
 
+    /**
+     * Инициализируем немодальные окна (Шаг 4).
+     * Причина: окна создаются один раз при старте.
+     * Следствие: история и состояние окон сохраняются между открытиями.
+     */
+    private void initWindows() {
+        automationWindow = new AutomationWindow(facade, automationService, commandHistory);
+        deviceDetailWindow = new DeviceDetailWindow(facade);
+        logWindow = new LogWindow(facade.getEventBus());
+    }
+
     private void setupDeviceList() {
         deviceListView.setItems(deviceItems);
+        // Причина: детали не видны в списке → двойной клик открывает DeviceDetailWindow
+        // Следствие: немодальное окно с параметрами и управлением устройством
+        deviceListView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                Device selected = deviceListView.getSelectionModel().getSelectedItem();
+                if (selected != null && deviceDetailWindow != null) {
+                    deviceDetailWindow.showDevice(selected);
+                }
+            }
+        });
         deviceListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         deviceListView.setCellFactory(lv -> new ListCell<>() {
             @Override
@@ -372,6 +404,26 @@ public class MainController {
     }
 
     @FXML
+    /**
+     * Открыть окно автоматизации (Шаг 4).
+     * Причина: авто-режимы тесно сидят в главном окне.
+     * Следствие: отдельное немодальное окно с историей команд.
+     */
+    @FXML
+    private void onOpenAutomationWindow() {
+        if (automationWindow != null) automationWindow.show();
+    }
+
+    /**
+     * Открыть окно журнала событий (Шаг 4).
+     * Причина: события EventBus нигде не отображаются — отладка затруднена.
+     * Следствие: живой лог всех событий системы в реальном времени.
+     */
+    @FXML
+    private void onOpenLogWindow() {
+        if (logWindow != null) logWindow.show();
+    }
+
     private void onExit() {
         Platform.exit();
     }

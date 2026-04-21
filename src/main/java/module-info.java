@@ -9,6 +9,7 @@ module com.smarthome {
     opens com.smarthome.controller to javafx.fxml;
     opens com.smarthome.view.component to javafx.fxml;
     opens com.smarthome.view.dialog to javafx.fxml;
+    opens com.smarthome.view.window to javafx.fxml;
     opens com.smarthome.model.device to com.google.gson;
     opens com.smarthome.model.room to com.google.gson;
     opens com.smarthome.model.house to com.google.gson;
@@ -20,6 +21,7 @@ module com.smarthome {
     exports com.smarthome.controller;
     exports com.smarthome.view.component;
     exports com.smarthome.view.dialog;
+    exports com.smarthome.view.window;
     exports com.smarthome.pattern.creational;
     exports com.smarthome.pattern.structural;
     exports com.smarthome.pattern.behavioral;

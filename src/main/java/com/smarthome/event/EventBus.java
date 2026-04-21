@@ -67,6 +67,13 @@ public class EventBus {
     /**
      * Очистить все подписки (при закрытии).
      */
+    /**
+     * Отписать глобального подписчика (нужно при закрытии LogWindow).
+     */
+    public void unsubscribeAll(java.util.function.Consumer<DeviceEvent> listener) {
+        globalListeners.remove(listener);
+    }
+
     public void clear() {
         listeners.clear();
         globalListeners.clear();
