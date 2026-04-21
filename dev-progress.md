@@ -1,6 +1,6 @@
 # Smart Home 3D UI — Прогресс разработки
 
-## Текущий шаг: 6 (Анимации)
+## Текущий шаг: 7 (Финальный отчёт)
 
 ## Завершённые шаги
 
@@ -95,6 +95,25 @@
 
 ---
 
+### ✅ ШАГ 6 — Анимации
+**Дата:** 2026-04-22  
+**Причина:** 3D-сцена статична — нет обратной связи на действия пользователя.  
+**Следствие:** четыре вида анимаций через AnimationFactory делают интерфейс живым
+               и понятным без текстовых подсказок.
+
+**Изменённые файлы:**
+- `src/main/java/com/smarthome/view/component/AnimationFactory.java` — создан (Factory Method)
+- `src/main/java/com/smarthome/view/component/Room3DView.java` — FadeTransition, TranslateTransition, hover, toggle, highlight
+- `src/main/java/com/smarthome/view/component/Room3DModel.java` — deviceModelById map, getDeviceModelById()
+- `src/main/java/com/smarthome/controller/MainController.java` — playToggleAnimation() при onToggleDevice()
+
+**GoF паттерн:**
+  Factory Method — AnimationFactory создаёт Animation-объекты; вызывающий код
+  не знает деталей (ScaleTransition, FadeTransition, TranslateTransition, Timeline).
+
+
+---
+
 ## Очередь
 
 - [x] ШАГ 1 — OBJ-загрузчик
@@ -102,5 +121,5 @@
 - [x] ШАГ 3 — Смена темы
 - [x] ШАГ 4 — Мультиоконный интерфейс
 - [x] ШАГ 5 — Текстуры комнат
-- [ ] ШАГ 6 — Анимации
+- [x] ШАГ 6 — Анимации
 - [ ] ШАГ 7 — Финальный отчёт + mvn compile

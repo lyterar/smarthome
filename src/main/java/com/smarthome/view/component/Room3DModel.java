@@ -13,6 +13,8 @@ import javafx.scene.text.Text;
 import javafx.scene.transform.Rotate;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 /**
@@ -31,6 +33,11 @@ public class Room3DModel extends Group {
 
     // Список 3D-моделей устройств (для drag в orbit-режиме)
     private final List<Group> deviceModels = new ArrayList<>();
+
+    // Маппинг deviceId → 3D-группа (для toggle-анимации, Шаг 6)
+    // Причина: анимация toggle должна найти нужную Group по ID устройства.
+    // Следствие: при создании каждой Group она регистрируется в этом маппинге.
+    private final Map<String, Group> deviceModelById = new HashMap<>();
 
     public Room3DModel(Room room) {
         this.room = room;
@@ -104,6 +111,9 @@ public class Room3DModel extends Group {
             deviceModel.setTranslateZ(dz);
 
             deviceModels.add(deviceModel);
+            // Причина: нужен доступ к Group по deviceId для toggle-анимации.
+            // Следствие: регистрируем в маппинге при создании.
+            deviceModelById.put(device.getId(), deviceModel);
             getChildren().add(deviceModel);
             i++;
         }
@@ -112,6 +122,11 @@ public class Room3DModel extends Group {
     /** Возвращает список 3D-групп устройств (для drag в orbit-режиме) */
     public List<Group> getDeviceModels() {
         return deviceModels;
+    }
+
+    /** Возвращает 3D-группу по ID устройства (для toggle-анимации, Шаг 6) */
+    public Group getDeviceModelById(String deviceId) {
+        return deviceModelById.get(deviceId);
     }
 
     private void addLabel() {

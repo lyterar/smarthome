@@ -267,6 +267,11 @@ public class MainController {
         facade.getEventBus().publish(new DeviceEvent("device_toggled", device.getId()));
         updateUndoRedo();
         updateStatus(device.getName() + " " + (device.isOn() ? "включено" : "выключено"));
+
+        // Причина: toggle в 2D/3D виде не отражается без перерисовки.
+        // Следствие: refreshAll() обновит 3D-модели; toggle-анимация
+        //            запускается на соответствующей Group в Room3DView.
+        room3DView.playToggleAnimation(device.getId(), device.isOn());
     }
 
     @FXML

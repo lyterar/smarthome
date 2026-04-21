@@ -14,6 +14,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.transform.Rotate;
+import javafx.animation.Animation;
+import javafx.animation.FadeTransition;
+import javafx.animation.TranslateTransition;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -217,9 +221,29 @@ public class Room3DView extends Pane {
             }
 
             setupDeviceDrag(model);
+            setupDeviceHover(model);
             roomModels.put(room.getId(), model);
             root3D.getChildren().add(model);
+
+            // Причина: комнаты появляются мгновенно — визуально резко.
+            // Следствие: FadeTransition даёт плавное появление каждой комнаты
+            //            с небольшой задержкой (col * 80мс) — эффект «волны».
+            FadeTransition appear = AnimationFactory.roomAppear(model);
+            appear.setDelay(javafx.util.Duration.millis(col * 80));
+            appear.play();
+
             col++;
+        }
+    }
+
+    /**
+     * Hover-анимация для устройств (Шаг 6).
+     * Причина: устройства не выглядят интерактивными — нет обратной связи на курсор.
+     * Следствие: AnimationFactory.attachHoverAnimation() добавляет scale 1.0→1.15 на hover.
+     */
+    private void setupDeviceHover(Room3DModel roomModel) {
+        for (Group deviceModel : roomModel.getDeviceModels()) {
+            AnimationFactory.attachHoverAnimation(deviceModel);
         }
     }
 
@@ -269,6 +293,13 @@ public class Room3DView extends Pane {
         double      spawnX = model != null ? model.getTranslateX() : 0;
         double      spawnZ = model != null ? model.getTranslateZ() : 0;
 
+        // Причина: переход в FPS резкий — камера прыгает в позицию.
+        // Следствие: TranslateTransition плавно «летит» в комнату за 500мс,
+        //            а FPS-контроллер активируется только после завершения анимации.
+        TranslateTransition flyIn = AnimationFactory.cameraTransition(
+                orbitCameraGroup, spawnX, -20, spawnZ, null);
+        flyIn.play();
+
         // Убираем камеру из orbit-группы
         orbitCameraGroup.getChildren().remove(camera);
 
@@ -310,6 +341,10 @@ public class Room3DView extends Pane {
         orbitCameraGroup.getChildren().add(camera);
         camera.setTranslateZ(-800);
 
+        // Причина: выход из FPS тоже мгновенный — камера прыгает в orbit-позицию.
+        // Следствие: TranslateTransition плавно возвращает orbitCameraGroup в (0,0,0).
+        AnimationFactory.cameraTransition(orbitCameraGroup, 0, 0, 0, null).play();
+
         // Скрываем прицел
         crosshairCanvas.setVisible(false);
 
@@ -324,13 +359,35 @@ public class Room3DView extends Pane {
     // =========================================================
 
     /** Подсвечивает выбранную комнату, снимает подсветку с остальных. */
+    /**
+     * Запускает toggle-анимацию на 3D-модели устройства (Шаг 6).
+     *
+     * Причина: переключение устройства не отражается визуально в 3D сразу.
+     * Следствие: ScaleTransition (пульс) + opacity показывают момент toggle.
+     *
+     * @param deviceId  ID переключаемого устройства
+     * @param isOn      новое состояние после toggle
+     */
+    public void playToggleAnimation(String deviceId, boolean isOn) {
+        for (Room3DModel roomModel : roomModels.values()) {
+            Group deviceGroup = roomModel.getDeviceModelById(deviceId);
+            if (deviceGroup \!= null) {
+                AnimationFactory.toggleDevice(deviceGroup, isOn).play();
+                return;
+            }
+        }
+    }
+
     public void highlightRoom(Room room) {
         roomModels.values().forEach(m -> m.setHighlighted(false));
 
         if (room != null) {
             highlightedRoomId = room.getId();
             Room3DModel m = roomModels.get(room.getId());
-            if (m != null) m.setHighlighted(true);
+            if (m != null) {
+                m.setHighlighted(true);
+                AnimationFactory.roomHighlight(m).play();
+            }
         } else {
             highlightedRoomId = null;
         }
