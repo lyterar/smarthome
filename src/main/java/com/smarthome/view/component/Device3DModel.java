@@ -53,7 +53,7 @@ public class Device3DModel {
         Color stateColor = getStateColor(type, isOn);
         Group objModel = ObjModelLoader.load(modelName, 1.0, stateColor);
 
-        if (objModel \!= null) {
+        if (objModel != null) {
             // OBJ успешно загружен — добавляем свет для лампы
             if (type == DeviceType.LIGHT && isOn) {
                 PointLight glow = new PointLight(Color.LIGHTYELLOW);

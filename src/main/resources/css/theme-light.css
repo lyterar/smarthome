@@ -1,0 +1,149 @@
+/* ============================================================
+   Светлая тема (Theme.LIGHT)
+   Причина: дневная работа → лучше читается при ярком освещении
+   Следствие: светлые фоны #f0f0f8, синие акценты, тёмный текст
+   ============================================================ */
+
+.root {
+    -fx-font-family: "System";
+    -fx-font-size: 13px;
+    -fx-background-color: #e8e8f0;
+}
+
+/* === Боковая панель === */
+.side-panel {
+    -fx-background-color: #f0f0f8;
+    -fx-border-color: #bbbbdd;
+    -fx-border-width: 0 1 0 0;
+}
+
+.app-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #3344aa;
+    -fx-padding: 0 0 4 0;
+}
+
+.panel-title {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #5566aa;
+    -fx-padding: 2 0 1 0;
+}
+
+/* === Кнопки === */
+.button {
+    -fx-background-color: #dcdcec;
+    -fx-text-fill: #333355;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 6 8;
+}
+.button:hover    { -fx-background-color: #c8c8e0; }
+.button:disabled { -fx-opacity: 0.4; }
+
+.btn-primary {
+    -fx-background-color: #3366cc;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 6 8;
+}
+.btn-primary:hover { -fx-background-color: #4477dd; }
+
+.btn-danger {
+    -fx-background-color: #cc3333;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 6 8;
+}
+.btn-danger:hover { -fx-background-color: #dd4444; }
+
+.btn-toggle {
+    -fx-background-color: #cc7700;
+    -fx-text-fill: white;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 6 8;
+}
+.btn-toggle:hover { -fx-background-color: #dd8800; }
+
+.btn-secondary {
+    -fx-background-color: #c0cce8;
+    -fx-text-fill: #223366;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-padding: 6 8;
+}
+.btn-secondary:hover { -fx-background-color: #aabbdd; }
+
+/* Кнопки тем */
+.btn-theme {
+    -fx-background-color: #dcdcec;
+    -fx-text-fill: #444466;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-padding: 4 6;
+    -fx-font-size: 11px;
+}
+.btn-theme:hover { -fx-background-color: #c8c8e0; }
+.btn-theme-active {
+    -fx-background-color: #3366cc;
+    -fx-text-fill: white;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-padding: 4 6;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+/* === Списки === */
+.dark-list {
+    -fx-background-color: #e0e0f0;
+    -fx-border-color: #bbbbdd;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 2;
+}
+.dark-list .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #334466;
+    -fx-padding: 4 6;
+    -fx-font-size: 12px;
+}
+.dark-list .list-cell:filled:selected {
+    -fx-background-color: #3366cc;
+    -fx-text-fill: white;
+}
+.dark-list .list-cell:filled:hover { -fx-background-color: #ccccee; }
+
+/* === ComboBox === */
+.combo-box {
+    -fx-background-color: #dcdcec;
+    -fx-border-color: #aaaacc;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+}
+.combo-box .list-cell { -fx-text-fill: #333355; -fx-background-color: transparent; }
+.combo-box-popup .list-view  { -fx-background-color: #dcdcec; }
+.combo-box-popup .list-cell  { -fx-background-color: #dcdcec; -fx-text-fill: #333355; }
+.combo-box-popup .list-cell:filled:hover { -fx-background-color: #c8c8e0; }
+
+/* === Разделитель === */
+.separator .line { -fx-border-color: #bbbbdd; }
+
+/* === Статусная строка === */
+.status-bar {
+    -fx-background-color: #e0e0ee;
+    -fx-border-color: #bbbbdd;
+    -fx-border-width: 1 0 0 0;
+}
+.status-bar .label { -fx-text-fill: #5566aa; -fx-font-size: 12px; }
+
+/* === Информация о доме === */
+.house-info {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6677bb;
+    -fx-padding: 2 0 0 0;
+}

@@ -1,6 +1,6 @@
 # Smart Home 3D UI — Прогресс разработки
 
-## Текущий шаг: 3 (Смена темы — Strategy)
+## Текущий шаг: 4 (Мультиоконный интерфейс)
 
 ## Завершённые шаги
 
@@ -15,10 +15,6 @@
 - `src/main/java/com/smarthome/view/component/Device3DModel.java` — обновлён (OBJ + fallback)
 - `src/main/resources/models/README.md` — создан (инструкция по скачиванию моделей)
 - `pom.xml` — добавлен комментарий о FXyz3D и причине нативной реализации
-
-**Примечание по FXyz3D:**
-  FXyz3D 0.6.0 недоступен (Bintray закрыт в 2021). Нативный парсер OBJ
-  реализован на JavaFX TriangleMesh — полностью эквивалентная замена.
 
 **GoF паттерн:**
   Factory Method — ObjModelLoader.load() и Device3DModel.createModel()
@@ -35,25 +31,37 @@
 - `src/main/java/com/smarthome/view/component/FpsCameraController.java` — полный рефакторинг
 - `src/main/java/com/smarthome/view/component/Room3DView.java` — Canvas-прицел + передача bounds
 
-**Детали реализации:**
-- Инерция: lerp текущей скорости к целевой (коэф. 0.15 + адаптация к dt)
-- Коллизии: setRoomBounds() передаёт AABB комнаты → clamp позиции при каждом кадре
-- Бег (Shift): множитель 2.2× скорости
-- Боббинг: Math.sin(walkTime * 8) * 2.5 по оси Y playerGroup
-- Прицел: Canvas поверх SubScene, mouseTransparent=true, крест с окантовкой
-- Захват мыши: setCursor(Cursor.NONE) при attach, DEFAULT при detach
-- setOnMouseMoved: поворот камеры без зажатой кнопки (как в настоящем FPS)
-- AnimationTimer с dt в секундах (защита от лагспайков > 0.05с)
-
 **GoF паттерн:**
   Strategy — FpsCameraController и CameraController взаимозаменяемы через attach/detach
 
 ---
 
+### ✅ ШАГ 3 — Смена темы (тёмная / светлая / синяя)
+**Дата:** 2026-04-21  
+**Причина:** одна тема → пользователь не может настроить интерфейс под своё освещение и вкус.  
+**Следствие:** три темы (тёмная, светлая, синяя) переключаются без перезапуска;
+               фон 3D-сцены синхронизируется с активной темой.
+
+**Изменённые файлы:**
+- `src/main/java/com/smarthome/service/ThemeService.java` — создан (Singleton + Strategy)
+- `src/main/resources/css/theme-dark.css` — создан (тёмная тема)
+- `src/main/resources/css/theme-light.css` — создан (светлая тема)
+- `src/main/resources/css/theme-blue.css` — создан (синяя тема, морской стиль)
+- `src/main/resources/fxml/main.fxml` — добавлены три кнопки тем, CSS переключён на theme-dark.css
+- `src/main/java/com/smarthome/view/component/Room3DView.java` — метод setSubSceneBackground()
+- `src/main/java/com/smarthome/controller/MainController.java` — обработчики onThemeDark/Light/Blue
+- **Исправлено:** backslash-\! синтаксические ошибки в FpsCameraController, Device3DModel, ObjModelLoader, Room3DView
+
+**GoF паттерн:**
+  Strategy — ThemeStrategy (интерфейс) реализован тремя конкретными стратегиями (DarkTheme,
+  LightTheme, BlueTheme). ThemeService — контекст, делегирующий применение CSS нужной стратегии.
+  Singleton — единственный экземпляр ThemeService.getInstance() на приложение.
+
+---
+
 ## Очередь
 
-- [ ] ШАГ 3 — Смена темы (dark/light/blue) — паттерн Strategy
-- [ ] ШАГ 4 — Мультиоконный интерфейс
+- [ ] ШАГ 4 — Мультиоконный интерфейс (AutomationWindow, DeviceDetailWindow, LogWindow)
 - [ ] ШАГ 5 — Текстуры комнат
 - [ ] ШАГ 6 — Анимации
 - [ ] ШАГ 7 — Финальный отчёт + mvn compile

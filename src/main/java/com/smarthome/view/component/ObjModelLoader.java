@@ -131,7 +131,7 @@ public class ObjModelLoader {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
         String line;
 
-        while ((line = reader.readLine()) \!= null) {
+        while ((line = reader.readLine()) != null) {
             line = line.trim();
             if (line.isEmpty() || line.startsWith("#")) continue;
 
@@ -172,7 +172,7 @@ public class ObjModelLoader {
                         String[] idx = parts[i + 1].split("/", -1);
                         faceVerts[i][0] = Integer.parseInt(idx[0]) - 1; // vertex (0-based)
                         // texIdx: если не указан — заглушка 0
-                        faceVerts[i][1] = (idx.length > 1 && \!idx[1].isEmpty())
+                        faceVerts[i][1] = (idx.length > 1 && !idx[1].isEmpty())
                                 ? Integer.parseInt(idx[1])  // OBJ с 1; заглушка под 0
                                 : 0;
                     }

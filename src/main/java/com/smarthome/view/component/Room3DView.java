@@ -266,8 +266,8 @@ public class Room3DView extends Pane {
         if (fpsMode) exitFpsMode();
 
         Room3DModel model  = roomModels.get(room.getId());
-        double      spawnX = model \!= null ? model.getTranslateX() : 0;
-        double      spawnZ = model \!= null ? model.getTranslateZ() : 0;
+        double      spawnX = model != null ? model.getTranslateX() : 0;
+        double      spawnZ = model != null ? model.getTranslateZ() : 0;
 
         // Убираем камеру из orbit-группы
         orbitCameraGroup.getChildren().remove(camera);
@@ -300,7 +300,7 @@ public class Room3DView extends Pane {
      * Выходит из FPS-режима, возвращает Orbit-камеру.
      */
     public void exitFpsMode() {
-        if (\!fpsMode || fpsController == null) return;
+        if (!fpsMode || fpsController == null) return;
 
         fpsController.detach(subScene);
         root3D.getChildren().remove(fpsController.getPlayerGroup());
@@ -327,13 +327,30 @@ public class Room3DView extends Pane {
     public void highlightRoom(Room room) {
         roomModels.values().forEach(m -> m.setHighlighted(false));
 
-        if (room \!= null) {
+        if (room != null) {
             highlightedRoomId = room.getId();
             Room3DModel m = roomModels.get(room.getId());
-            if (m \!= null) m.setHighlighted(true);
+            if (m != null) m.setHighlighted(true);
         } else {
             highlightedRoomId = null;
         }
+    }
+
+
+    // =========================================================
+    //  Смена фона (вызывается ThemeService)
+    // =========================================================
+
+    /**
+     * Меняет цвет фона SubScene при смене темы.
+     *
+     * Причина: SubScene имеет независимый фон, не управляемый CSS.
+     * Следствие: при смене темы фон 3D-сцены синхронизируется с новой палитрой.
+     *
+     * @param color новый цвет фона из ThemeService.getSubSceneColor()
+     */
+    public void setSubSceneBackground(javafx.scene.paint.Color color) {
+        subScene.setFill(color);
     }
 
     public boolean isFpsMode() {

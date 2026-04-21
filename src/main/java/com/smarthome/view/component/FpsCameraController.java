@@ -126,7 +126,7 @@ public class FpsCameraController {
         // Захват мыши: скрываем курсор в FPS-режиме
         // Причина: курсор отвлекает от прицела
         // Следствие: взгляд управляется движением мыши без визуального курсора
-        if (subScene.getScene() \!= null) {
+        if (subScene.getScene() != null) {
             subScene.getScene().setCursor(Cursor.NONE);
         }
 
@@ -156,7 +156,7 @@ public class FpsCameraController {
         keyPressHandler = e -> {
             pressedKeys.add(e.getCode().getName());
             // ESC: выход в Orbit-режим
-            if (e.getCode() == KeyCode.ESCAPE && onExit \!= null) {
+            if (e.getCode() == KeyCode.ESCAPE && onExit != null) {
                 onExit.run();
             }
         };
@@ -168,12 +168,12 @@ public class FpsCameraController {
         subScene.setOnMouseDragged(mouseMoveHandler);
 
         // Клавиши слушаем на уровне Scene (SubScene не фокусируется)
-        if (subScene.getScene() \!= null) {
+        if (subScene.getScene() != null) {
             subScene.getScene().setOnKeyPressed(keyPressHandler);
             subScene.getScene().setOnKeyReleased(keyReleaseHandler);
         } else {
             subScene.sceneProperty().addListener((obs, old, newScene) -> {
-                if (newScene \!= null) {
+                if (newScene != null) {
                     newScene.setOnKeyPressed(keyPressHandler);
                     newScene.setOnKeyReleased(keyReleaseHandler);
                     newScene.setCursor(Cursor.NONE);
@@ -197,7 +197,7 @@ public class FpsCameraController {
 
     /** Отключает обработчики и останавливает таймер. */
     public void detach(SubScene subScene) {
-        if (movementTimer \!= null) {
+        if (movementTimer != null) {
             movementTimer.stop();
             movementTimer = null;
         }
@@ -207,7 +207,7 @@ public class FpsCameraController {
         subScene.setOnMouseDragged(null);
 
         // Возвращаем курсор и снимаем клавишные обработчики
-        if (subScene.getScene() \!= null) {
+        if (subScene.getScene() != null) {
             subScene.getScene().setCursor(Cursor.DEFAULT);
             subScene.getScene().setOnKeyPressed(null);
             subScene.getScene().setOnKeyReleased(null);

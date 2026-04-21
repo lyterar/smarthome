@@ -10,6 +10,7 @@ import com.smarthome.pattern.behavioral.ToggleDeviceCommand;
 import com.smarthome.pattern.structural.SmartHomeFacade;
 import com.smarthome.service.AutomationService;
 import com.smarthome.service.HouseSaveService;
+import com.smarthome.service.ThemeService;
 import com.smarthome.pattern.creational.SmartHomeEngine;
 import com.smarthome.view.component.Room3DView;
 import com.smarthome.view.component.RoomCanvas;
@@ -29,6 +30,8 @@ import java.io.File;
 /**
  * Главный контроллер приложения.
  * Связывает UI (FXML) с логикой (Facade).
+ *
+ * Шаг 3: добавлена поддержка смены тем через ThemeService (паттерн Strategy).
  */
 public class MainController {
 
@@ -43,11 +46,19 @@ public class MainController {
     @FXML private Button undoButton;
     @FXML private Button redoButton;
 
+    // --- Кнопки тем (Шаг 3) ---
+    // Причина: нужно визуально выделять активную тему
+    // Следствие: при смене темы CSS-класс кнопок обновляется
+    @FXML private Button btnThemeDark;
+    @FXML private Button btnThemeLight;
+    @FXML private Button btnThemeBlue;
+
     // --- Сервисы ---
     private SmartHomeFacade facade;
     private AutomationService automationService;
     private CommandHistory commandHistory;
     private HouseSaveService saveService;
+    private ThemeService themeService;
 
     // --- Данные ---
     private ObservableList<Room> roomItems = FXCollections.observableArrayList();
@@ -60,6 +71,7 @@ public class MainController {
         automationService = new AutomationService();
         commandHistory = new CommandHistory();
         saveService = new HouseSaveService(SmartHomeEngine.getInstance().getDeviceFactory());
+        themeService = ThemeService.getInstance();
 
         setupRoomList();
         setupDeviceList();
@@ -86,7 +98,7 @@ public class MainController {
 
     private void setupDeviceList() {
         deviceListView.setItems(deviceItems);
-        deviceListView.getSelectionModel().setSelectionMode(javafx.scene.control.SelectionMode.MULTIPLE);
+        deviceListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         deviceListView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(Device device, boolean empty) {
@@ -118,6 +130,49 @@ public class MainController {
         // Подписываемся на все события для обновления UI
         facade.getEventBus().subscribeAll(event ->
                 Platform.runLater(this::refreshAll));
+    }
+
+    // =========================================================
+    //  Смена темы (Шаг 3 — паттерн Strategy)
+    // =========================================================
+
+    /**
+     * Применяет тему и обновляет кнопки-индикаторы.
+     *
+     * Причина: повторяющийся код в каждом обработчике кнопки темы.
+     * Следствие: единый метод applyTheme() — кнопки сбрасываются,
+     *            нужная помечается как активная, SubScene получает новый фон.
+     */
+    private void applyTheme(ThemeService.Theme theme) {
+        // Применяем CSS через ThemeService (Strategy)
+        themeService.applyTheme(room3DView.getScene(), theme);
+
+        // Синхронизируем фон 3D-сцены с новой темой
+        // Причина: SubScene.fill не управляется CSS, нужен явный вызов
+        // Следствие: 3D фон и UI-фон визуально совпадают
+        room3DView.setSubSceneBackground(themeService.getSubSceneColor());
+
+        // Обновляем стили кнопок-индикаторов
+        btnThemeDark.getStyleClass().setAll(theme == ThemeService.Theme.DARK  ? "btn-theme-active" : "btn-theme");
+        btnThemeLight.getStyleClass().setAll(theme == ThemeService.Theme.LIGHT ? "btn-theme-active" : "btn-theme");
+        btnThemeBlue.getStyleClass().setAll(theme == ThemeService.Theme.BLUE  ? "btn-theme-active" : "btn-theme");
+
+        updateStatus("Тема: " + themeService.getCurrentThemeName());
+    }
+
+    @FXML
+    private void onThemeDark() {
+        applyTheme(ThemeService.Theme.DARK);
+    }
+
+    @FXML
+    private void onThemeLight() {
+        applyTheme(ThemeService.Theme.LIGHT);
+    }
+
+    @FXML
+    private void onThemeBlue() {
+        applyTheme(ThemeService.Theme.BLUE);
     }
 
     // === Обработчики кнопок (вызываются из FXML) ===
@@ -252,7 +307,7 @@ public class MainController {
             return;
         }
 
-        if (selectedRoom != null) {
+        if (selectedRoom \!= null) {
             automationService.applyStrategy(strategy, selectedRoom);
             updateStatus(strategy.getName() + " применён к " + selectedRoom.getName());
         } else {
@@ -287,7 +342,7 @@ public class MainController {
                 new FileChooser.ExtensionFilter("JSON", "*.json"));
         chooser.setInitialFileName("my_house.json");
         File file = chooser.showSaveDialog(room3DView.getScene().getWindow());
-        if (file != null) {
+        if (file \!= null) {
             try {
                 saveService.save(facade.getHouse(), file.toPath());
                 updateStatus("Сохранено: " + file.getName());
@@ -304,7 +359,7 @@ public class MainController {
         chooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("JSON", "*.json"));
         File file = chooser.showOpenDialog(room3DView.getScene().getWindow());
-        if (file != null) {
+        if (file \!= null) {
             try {
                 House house = saveService.load(file.toPath());
                 SmartHomeEngine.getInstance().setHouse(house);
@@ -326,7 +381,7 @@ public class MainController {
     private void onRoomSelected(Room room) {
         selectedRoom = room;
         deviceItems.clear();
-        if (room != null) {
+        if (room \!= null) {
             deviceItems.addAll(room.getDevices());
             room3DView.highlightRoom(room);
         }
@@ -334,24 +389,24 @@ public class MainController {
 
     private void refreshAll() {
         roomItems.setAll(facade.getRooms());
-        if (selectedRoom != null) {
+        if (selectedRoom \!= null) {
             // Обновляем ссылку на комнату (могла пересоздаться)
             selectedRoom = facade.getHouse().findRoomById(selectedRoom.getId());
-            if (selectedRoom != null) {
+            if (selectedRoom \!= null) {
                 deviceItems.setAll(selectedRoom.getDevices());
             } else {
                 deviceItems.clear();
             }
         }
-        if (!room3DView.isFpsMode()) room3DView.drawHouse(facade.getHouse());
+        if (\!room3DView.isFpsMode()) room3DView.drawHouse(facade.getHouse());
         if (roomCanvas.isVisible()) roomCanvas.drawHouse(facade.getHouse());
         houseInfoLabel.setText(facade.getHouseSummary());
         updateUndoRedo();
     }
 
     private void updateUndoRedo() {
-        undoButton.setDisable(!commandHistory.canUndo());
-        redoButton.setDisable(!commandHistory.canRedo());
+        undoButton.setDisable(\!commandHistory.canUndo());
+        redoButton.setDisable(\!commandHistory.canRedo());
         undoButton.setTooltip(new Tooltip(commandHistory.getUndoDescription()));
         redoButton.setTooltip(new Tooltip(commandHistory.getRedoDescription()));
     }

@@ -8,17 +8,17 @@
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.smarthome.controller.MainController"
-            stylesheets="@../css/style.css"
+            stylesheets="@../css/theme-dark.css"
             prefWidth="1200" prefHeight="750">
 
-    <!-- Боковое меню слева -->
+    <\!-- Боковое меню слева -->
     <left>
         <VBox prefWidth="280" styleClass="side-panel" spacing="8">
             <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
 
             <Label text="УМНЫЙ ДОМ" styleClass="app-title"/>
 
-            <!-- Переключатель режимов вида -->
+            <\!-- Переключатель режимов вида -->
             <HBox spacing="6">
                 <Button text="2D" onAction="#onSwitch2D" styleClass="btn-secondary"
                         HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
@@ -84,11 +84,26 @@
 
             <Separator/>
 
+            <\!-- Переключатель тем -->
+            <\!-- Причина: пользователь хочет выбрать тему под своё освещение/вкус -->
+            <\!-- Следствие: три кнопки мгновенно меняют CSS всей сцены и фон 3D -->
+            <Label text="Тема" styleClass="panel-title"/>
+            <HBox spacing="4">
+                <Button fx:id="btnThemeDark"  text="Тёмная"  onAction="#onThemeDark"
+                        styleClass="btn-theme-active" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button fx:id="btnThemeLight" text="Светлая" onAction="#onThemeLight"
+                        styleClass="btn-theme" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button fx:id="btnThemeBlue"  text="Синяя"   onAction="#onThemeBlue"
+                        styleClass="btn-theme" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+            </HBox>
+
+            <Separator/>
+
             <Label fx:id="houseInfoLabel" text="0 комнат" styleClass="house-info" wrapText="true"/>
         </VBox>
     </left>
 
-    <!-- Центр: 2D или 3D вид (переключаются через visible) -->
+    <\!-- Центр: 2D или 3D вид (переключаются через visible) -->
     <center>
         <StackPane>
             <RoomCanvas fx:id="roomCanvas" visible="false"/>
@@ -96,7 +111,7 @@
         </StackPane>
     </center>
 
-    <!-- Статусная строка -->
+    <\!-- Статусная строка -->
     <bottom>
         <HBox styleClass="status-bar" alignment="CENTER_LEFT">
             <padding><Insets top="5" right="10" bottom="5" left="10"/></padding>
