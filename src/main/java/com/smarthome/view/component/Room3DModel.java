@@ -5,6 +5,7 @@ import com.smarthome.model.room.Room;
 
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.text.Font;
@@ -53,8 +54,12 @@ public class Room3DModel extends Group {
         double floorD = room.getHeight();
 
         // Пол
+        // Причина: однотонный пол выглядит пусто и не передаёт тип комнаты.
+        // Следствие: процедурная текстура из RoomTextureFactory накладывается
+        //            через PhongMaterial.setDiffuseMap() — зависит от RoomType.
         Box floor = new Box(floorW, 2, floorD);
-        floor.setMaterial(new PhongMaterial(Color.web(room.getType().getColor())));
+        PhongMaterial floorMaterial = createFloorMaterial();
+        floor.setMaterial(floorMaterial);
 
         // Стены: front (+Z), back (-Z), left (-X), right (+X)
         walls[0] = new Box(floorW, WALL_H, WALL_THICKNESS);
@@ -127,4 +132,22 @@ public class Room3DModel extends Group {
             wall.setMaterial(mat);
         }
     }
+
+    /**
+     * Создаёт материал пола с процедурной текстурой из RoomTextureFactory.
+     *
+     * Причина: PhongMaterial.setDiffuseMap() принимает Image — WritableImage подходит.
+     * Следствие: каждый RoomType получает визуально отличимую поверхность
+     *            (дерево, плитка, ковёр, бетон) без внешних PNG-файлов.
+     */
+    private PhongMaterial createFloorMaterial() {
+        WritableImage texture = RoomTextureFactory.getFloorTexture(room.getType());
+        PhongMaterial mat = new PhongMaterial();
+        mat.setDiffuseMap(texture);
+        // Лёгкий бликовый эффект — поверхность выглядит отполированной
+        mat.setSpecularColor(Color.web("#ffffff40"));
+        mat.setSpecularPower(20);
+        return mat;
+    }
+
 }

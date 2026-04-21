@@ -1,6 +1,6 @@
 # Smart Home 3D UI — Прогресс разработки
 
-## Текущий шаг: 5 (Текстуры комнат)
+## Текущий шаг: 6 (Анимации)
 
 ## Завершённые шаги
 
@@ -77,12 +77,30 @@
 
 ---
 
+### ✅ ШАГ 5 — Текстуры комнат
+**Дата:** 2026-04-22  
+**Причина:** однотонный цвет пола → все комнаты выглядят одинаково и пусто.  
+**Следствие:** процедурные текстуры (WritableImage) накладываются через PhongMaterial.setDiffuseMap();
+               каждый RoomType получает уникальную поверхность: дерево, плитка, ковёр, бетон.
+
+**Изменённые файлы:**
+- `src/main/java/com/smarthome/view/component/RoomTextureFactory.java` — создан (Factory Method)
+- `src/main/java/com/smarthome/view/component/Room3DModel.java` — метод createFloorMaterial()
+- `src/main/resources/textures/README.md` — создан (документация)
+
+**GoF паттерн:**
+  Factory Method — RoomTextureFactory.getFloorTexture(RoomType) создаёт нужную текстуру;
+  кэширование через EnumMap — каждый тип генерируется один раз.
+
+
+---
+
 ## Очередь
 
 - [x] ШАГ 1 — OBJ-загрузчик
 - [x] ШАГ 2 — FPS движение
 - [x] ШАГ 3 — Смена темы
 - [x] ШАГ 4 — Мультиоконный интерфейс
-- [ ] ШАГ 5 — Текстуры комнат
+- [x] ШАГ 5 — Текстуры комнат
 - [ ] ШАГ 6 — Анимации
 - [ ] ШАГ 7 — Финальный отчёт + mvn compile
