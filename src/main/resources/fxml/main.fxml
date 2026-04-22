@@ -3,35 +3,27 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-<?import com.smarthome.view.component.Room3DView?>
-<?import com.smarthome.view.component.RoomCanvas?>
 
 <BorderPane xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.smarthome.controller.MainController"
             stylesheets="@../css/theme-dark.css"
-            prefWidth="1200" prefHeight="750">
+            prefWidth="320" prefHeight="700">
 
-    <\!-- Боковое меню слева -->
+    <\!-- Главное окно = диспетчер. Каждая функция — в своём окне. -->
+
     <left>
-        <VBox prefWidth="280" styleClass="side-panel" spacing="8">
-            <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+        <VBox prefWidth="300" styleClass="side-panel" spacing="8">
+            <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
 
+            <\!-- Заголовок -->
             <Label text="УМНЫЙ ДОМ" styleClass="app-title"/>
-
-            <\!-- Переключатель режимов вида -->
-            <HBox spacing="6">
-                <Button text="2D" onAction="#onSwitch2D" styleClass="btn-secondary"
-                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                <Button text="3D" onAction="#onSwitch3D" styleClass="btn-secondary"
-                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                <Button text="FPS" onAction="#onSwitchFps" styleClass="btn-secondary"
-                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-            </HBox>
+            <Label text="Главное меню" style="-fx-text-fill:#64748b; -fx-font-size:12px;"/>
 
             <Separator/>
 
+            <\!-- ══ КОМНАТЫ ══ -->
             <Label text="Комнаты" styleClass="panel-title"/>
-            <ListView fx:id="roomListView" prefHeight="155" styleClass="dark-list"/>
+            <ListView fx:id="roomListView" prefHeight="220" styleClass="dark-list"/>
 
             <HBox spacing="6">
                 <Button text="+ Комната" onAction="#onAddRoom" styleClass="btn-primary"
@@ -41,40 +33,46 @@
 
             <Separator/>
 
-            <Label text="Устройства" styleClass="panel-title"/>
-            <ListView fx:id="deviceListView" prefHeight="130" styleClass="dark-list"/>
+            <\!-- ══ ОКНА — кнопки открытия ══ -->
+            <Label text="Окна" styleClass="panel-title"/>
+            <Label text="Каждое окно — отдельная задача"
+                   style="-fx-text-fill:#475569; -fx-font-size:11px;"/>
 
-            <HBox spacing="6">
-                <Button text="+ Устройство" onAction="#onAddDevice" styleClass="btn-primary"
-                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                <Button text="−" onAction="#onRemoveDevice" styleClass="btn-danger" prefWidth="36"/>
-            </HBox>
-
-            <Button text="Вкл / Выкл" onAction="#onToggleDevice" styleClass="btn-toggle"
+            <\!-- Вид (2D/3D/FPS) -->
+            <Button text="🖥  Открыть вид  (2D / 3D / FPS)"
+                    onAction="#onOpenViewWindow"
+                    styleClass="btn-secondary"
                     maxWidth="Infinity"/>
-            <HBox spacing="6">
-                <Button text="Логирование" onAction="#onEnableLogging" styleClass="btn-secondary"
-                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                <Button text="+ Группа" onAction="#onCreateGroup" styleClass="btn-secondary"
-                        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-            </HBox>
+
+            <\!-- Устройства -->
+            <Button text="💡  Устройства"
+                    onAction="#onOpenDeviceWindow"
+                    styleClass="btn-secondary"
+                    maxWidth="Infinity"/>
+
+            <\!-- Автоматизация -->
+            <Button text="⚙️  Автоматизация"
+                    onAction="#onOpenAutomationWindow"
+                    styleClass="btn-secondary"
+                    maxWidth="Infinity"/>
+
+            <\!-- Журнал событий -->
+            <Button text="📋  Журнал событий"
+                    onAction="#onOpenLogWindow"
+                    styleClass="btn-secondary"
+                    maxWidth="Infinity"/>
 
             <Separator/>
 
-            <Label text="Автоматизация" styleClass="panel-title"/>
-            <ComboBox fx:id="automationCombo" promptText="Выбрать режим" maxWidth="Infinity"/>
-            <Button text="Применить" onAction="#onApplyAutomation" styleClass="btn-secondary"
-                    maxWidth="Infinity"/>
-
-            <Separator/>
-
+            <\!-- ══ ИСТОРИЯ КОМАНД ══ -->
             <HBox spacing="6">
-                <Button fx:id="undoButton" text="Отмена" onAction="#onUndo"
+                <Button fx:id="undoButton" text="↩ Отмена" onAction="#onUndo"
                         HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                <Button fx:id="redoButton" text="Повтор" onAction="#onRedo"
+                <Button fx:id="redoButton" text="↪ Повтор" onAction="#onRedo"
                         HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
             </HBox>
 
+            <\!-- ══ СОХРАНЕНИЕ ══ -->
             <HBox spacing="6">
                 <Button text="Сохранить" onAction="#onSaveHouse" styleClass="btn-secondary"
                         HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
@@ -84,42 +82,25 @@
 
             <Separator/>
 
-            <\!-- Переключатель тем -->
-            <\!-- Причина: пользователь хочет выбрать тему под своё освещение/вкус -->
-            <\!-- Следствие: три кнопки мгновенно меняют CSS всей сцены и фон 3D -->
+            <\!-- ══ ТЕМА ══ -->
             <Label text="Тема" styleClass="panel-title"/>
             <HBox spacing="4">
                 <Button fx:id="btnThemeDark"  text="Тёмная"  onAction="#onThemeDark"
                         styleClass="btn-theme-active" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
                 <Button fx:id="btnThemeLight" text="Светлая" onAction="#onThemeLight"
-                        styleClass="btn-theme" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                        styleClass="btn-theme"        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
                 <Button fx:id="btnThemeBlue"  text="Синяя"   onAction="#onThemeBlue"
-                        styleClass="btn-theme" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                        styleClass="btn-theme"        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
             </HBox>
 
+            <\!-- Растягивающийся пустой блок — прижимает инфо к низу -->
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <\!-- ══ ИНФОРМАЦИЯ ══ -->
             <Separator/>
-
-            <!-- Кнопки окон (Шаг 4 — Мультиоконный интерфейс) -->
-            <!-- Причина: окна автоматизации и лога надо как-то открывать -->
-            <!-- Следствие: две кнопки в боковой панели -->
-            <HBox spacing="6">
-                <Button text="Автоматизация" onAction="#onOpenAutomationWindow"
-                        styleClass="btn-secondary" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-                <Button text="Журнал" onAction="#onOpenLogWindow"
-                        styleClass="btn-secondary" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
-            </HBox>
-
             <Label fx:id="houseInfoLabel" text="0 комнат" styleClass="house-info" wrapText="true"/>
         </VBox>
     </left>
-
-    <\!-- Центр: 2D или 3D вид (переключаются через visible) -->
-    <center>
-        <StackPane>
-            <RoomCanvas fx:id="roomCanvas" visible="false"/>
-            <Room3DView fx:id="room3DView"/>
-        </StackPane>
-    </center>
 
     <\!-- Статусная строка -->
     <bottom>
