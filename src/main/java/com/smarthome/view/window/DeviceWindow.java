@@ -118,7 +118,7 @@ public class DeviceWindow {
         deviceListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 Device sel = deviceListView.getSelectionModel().getSelectedItem();
-                if (sel \!= null && detailWindow \!= null) {
+                if (sel != null && detailWindow != null) {
                     detailWindow.showDevice(sel);
                 }
             }
@@ -208,7 +208,7 @@ public class DeviceWindow {
         facade.getEventBus().publish(new DeviceEvent("device_toggled", sel.getId()));
 
         // Уведомляем главный контроллер для анимации в ViewWindow
-        if (onToggle \!= null) {
+        if (onToggle != null) {
             onToggle.accept(new DeviceToggleEvent(sel.getId(), sel.isOn()));
         }
         setStatus(sel.getName() + " " + (sel.isOn() ? "включено" : "выключено"));
@@ -225,7 +225,7 @@ public class DeviceWindow {
     private void onOpenDetail() {
         Device sel = deviceListView.getSelectionModel().getSelectedItem();
         if (sel == null) { setStatus("Выберите устройство"); return; }
-        if (detailWindow \!= null) detailWindow.showDevice(sel);
+        if (detailWindow != null) detailWindow.showDevice(sel);
     }
 
     // ─── Публичный API ────────────────────────────────────────────────────────
@@ -242,7 +242,7 @@ public class DeviceWindow {
      */
     public void setRoom(Room room) {
         this.currentRoom = room;
-        if (room \!= null) {
+        if (room != null) {
             roomLabel.setText("Комната: " + room.getName());
             stage.setTitle("Устройства — " + room.getName());
         } else {
@@ -256,10 +256,10 @@ public class DeviceWindow {
     public void refreshDevices() {
         Platform.runLater(() -> {
             deviceItems.clear();
-            if (currentRoom \!= null) {
+            if (currentRoom != null) {
                 // Получаем свежую ссылку на комнату
                 Room fresh = facade.getHouse().findRoomById(currentRoom.getId());
-                if (fresh \!= null) {
+                if (fresh != null) {
                     currentRoom = fresh;
                     deviceItems.addAll(fresh.getDevices());
                 }

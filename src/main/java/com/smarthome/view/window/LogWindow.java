@@ -95,7 +95,7 @@ public class LogWindow {
         Button btnPause = new Button("Пауза");
         btnPause.setStyle("-fx-background-color: #555; -fx-text-fill: white; -fx-cursor: hand;");
         btnPause.setOnAction(e -> {
-            paused = \!paused;
+            paused = !paused;
             btnPause.setText(paused ? "Продолжить" : "Пауза");
             btnPause.setStyle(paused
                 ? "-fx-background-color: #a05000; -fx-text-fill: white; -fx-cursor: hand;"
@@ -130,7 +130,7 @@ public class LogWindow {
 
                 // Фильтрация по введённому тексту
                 String filter = filterField.getText().trim().toLowerCase();
-                if (\!filter.isEmpty() && \!entry.text.toLowerCase().contains(filter)) {
+                if (!filter.isEmpty() && !entry.text.toLowerCase().contains(filter)) {
                     setText(null); setStyle("-fx-background-color: #111;"); return;
                 }
 
@@ -166,7 +166,7 @@ public class LogWindow {
                 timeStr,
                 event.getType(),
                 event.getTargetId(),
-                event.getData() \!= null ? " | data=" + event.getData() : "");
+                event.getData() != null ? " | data=" + event.getData() : "");
 
         Platform.runLater(() -> {
             logEntries.add(0, new LogEntry(event.getType(), text));
@@ -176,7 +176,7 @@ public class LogWindow {
             }
             updateCount();
             // Авто-прокрутка (к первому элементу, т.к. добавляем сверху)
-            if (chkAutoScroll.isSelected() && \!logEntries.isEmpty()) {
+            if (chkAutoScroll.isSelected() && !logEntries.isEmpty()) {
                 logListView.scrollTo(0);
             }
         });

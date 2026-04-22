@@ -126,7 +126,7 @@ public class AnimationFactory {
         tt.setToY(targetY);
         tt.setToZ(targetZ);
         tt.setInterpolator(Interpolator.EASE_BOTH);
-        if (onFinished \!= null) {
+        if (onFinished != null) {
             tt.setOnFinished(e -> onFinished.run());
         }
         return tt;

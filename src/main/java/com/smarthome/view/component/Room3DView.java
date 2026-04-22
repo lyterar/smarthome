@@ -371,7 +371,7 @@ public class Room3DView extends Pane {
     public void playToggleAnimation(String deviceId, boolean isOn) {
         for (Room3DModel roomModel : roomModels.values()) {
             Group deviceGroup = roomModel.getDeviceModelById(deviceId);
-            if (deviceGroup \!= null) {
+            if (deviceGroup != null) {
                 AnimationFactory.toggleDevice(deviceGroup, isOn).play();
                 return;
             }

@@ -87,7 +87,7 @@ public class AutomationWindow {
                 setText(empty || s == null ? "Выберите стратегию..." : s.getName());
             }
         });
-        if (\!strategyCombo.getItems().isEmpty()) {
+        if (!strategyCombo.getItems().isEmpty()) {
             strategyCombo.getSelectionModel().selectFirst();
         }
 
@@ -207,7 +207,7 @@ public class AutomationWindow {
     private void refreshRoomList() {
         roomItems.clear();
         facade.getRooms().forEach(r -> roomItems.add(r.getName()));
-        if (roomCombo \!= null) roomCombo.setValue(null);
+        if (roomCombo != null) roomCombo.setValue(null);
     }
 
     private void addHistory(String record) {
@@ -219,8 +219,8 @@ public class AutomationWindow {
 
     private void updateUndoRedo() {
         if (btnUndo == null) return;
-        btnUndo.setDisable(\!commandHistory.canUndo());
-        btnRedo.setDisable(\!commandHistory.canRedo());
+        btnUndo.setDisable(!commandHistory.canUndo());
+        btnRedo.setDisable(!commandHistory.canRedo());
     }
 
     private void setStatus(String text) {
@@ -229,7 +229,7 @@ public class AutomationWindow {
 
     public void show() {
         refreshRoomList();
-        if (roomCombo \!= null) roomCombo.setValue(null);
+        if (roomCombo != null) roomCombo.setValue(null);
         stage.show();
         stage.toFront();
     }

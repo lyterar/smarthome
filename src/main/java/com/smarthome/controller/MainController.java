@@ -155,7 +155,7 @@ public class MainController {
         // Синхронизируем все окна с выбранной комнатой
         viewWindow.setCurrentRoom(room);
         deviceWindow.setRoom(room);
-        if (room \!= null) {
+        if (room != null) {
             updateStatus("Выбрана: " + room.getName() +
                          " (" + room.getDevices().size() + " устройств)");
         }
@@ -250,8 +250,8 @@ public class MainController {
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON", "*.json"));
         chooser.setInitialFileName("my_house.json");
         File file = chooser.showSaveDialog(
-            roomListView.getScene() \!= null ? roomListView.getScene().getWindow() : null);
-        if (file \!= null) {
+            roomListView.getScene() != null ? roomListView.getScene().getWindow() : null);
+        if (file != null) {
             try {
                 saveService.save(facade.getHouse(), file.toPath());
                 updateStatus("Сохранено: " + file.getName());
@@ -267,8 +267,8 @@ public class MainController {
         chooser.setTitle("Загрузить дом");
         chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON", "*.json"));
         File file = chooser.showOpenDialog(
-            roomListView.getScene() \!= null ? roomListView.getScene().getWindow() : null);
-        if (file \!= null) {
+            roomListView.getScene() != null ? roomListView.getScene().getWindow() : null);
+        if (file != null) {
             try {
                 House house = saveService.load(file.toPath());
                 SmartHomeEngine.getInstance().setHouse(house);
@@ -287,7 +287,7 @@ public class MainController {
      * Следствие: тема применяется к главному окну и к 3D-фону ViewWindow.
      */
     private void applyTheme(ThemeService.Theme theme) {
-        if (roomListView.getScene() \!= null) {
+        if (roomListView.getScene() != null) {
             themeService.applyTheme(roomListView.getScene(), theme);
         }
         // Синхронизировать фон 3D-сцены в ViewWindow
@@ -310,7 +310,7 @@ public class MainController {
 
     private void refreshAll() {
         roomItems.setAll(facade.getRooms());
-        if (selectedRoom \!= null) {
+        if (selectedRoom != null) {
             selectedRoom = facade.getHouse().findRoomById(selectedRoom.getId());
         }
         houseInfoLabel.setText(facade.getHouseSummary());
@@ -318,11 +318,11 @@ public class MainController {
     }
 
     private void updateUndoRedo() {
-        if (undoButton \!= null) undoButton.setDisable(\!commandHistory.canUndo());
-        if (redoButton \!= null) redoButton.setDisable(\!commandHistory.canRedo());
+        if (undoButton != null) undoButton.setDisable(!commandHistory.canUndo());
+        if (redoButton != null) redoButton.setDisable(!commandHistory.canRedo());
     }
 
     private void updateStatus(String text) {
-        if (statusLabel \!= null) statusLabel.setText(text);
+        if (statusLabel != null) statusLabel.setText(text);
     }
 }

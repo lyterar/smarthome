@@ -1,6 +1,6 @@
 # Smart Home 3D UI — Прогресс разработки
 
-## Текущий шаг: ШАГ 8 — Полноценный мультиоконный режим ✅
+## Текущий шаг: ШАГ 9 — Исправление критических синтаксических ошибок ✅
 
 ## Завершённые шаги
 
@@ -12,31 +12,34 @@
 ### ✅ ШАГ 8 — Полноценный мультиоконный режим
 **Дата:** 2026-04-22
 
-**Причина:** главное окно содержало всё: 3D-вид, список устройств, автоматизацию —
-             интерфейс был перегружен, окна автоматизации и журнала не открывались
-             из-за дублирующейся аннотации @FXML.
-**Следствие:** 5 немодальных окон с чёткими ролями:
+### ✅ ШАГ 9 — Исправление критических синтаксических ошибок
+**Дата:** 2026-04-22
 
-| Окно                | Роль                                             | Файл                      |
-|---------------------|--------------------------------------------------|---------------------------|
-| Главное             | Диспетчер: комнаты, темы, undo/redo, сохранение  | main.fxml + MainController|
-| ViewWindow          | 2D / 3D / FPS просмотр на отдельном мониторе     | view/window/ViewWindow     |
-| DeviceWindow        | Устройства: добавить, удалить, toggle, логи      | view/window/DeviceWindow   |
-| AutomationWindow    | Стратегии автоматизации + история применений      | view/window/AutomationWindow|
-| LogWindow           | Живой лог EventBus в реальном времени             | view/window/LogWindow      |
-| DeviceDetailWindow  | Детали устройства (двойной клик)                  | view/window/DeviceDetailWindow|
+**Причина:** shell-экранирование заменяло `\!` на `\\!` и `<\!--` на `<\\!--`
+             во всех файлах, созданных через bash echo/heredoc в предыдущих сессиях.
+             Это вызвало бы ошибки компиляции Java и ошибку парсинга FXML.
 
-**Изменённые файлы:**
-- `src/main/java/com/smarthome/view/window/ViewWindow.java` — создан
-- `src/main/java/com/smarthome/view/window/DeviceWindow.java` — создан
-- `src/main/java/com/smarthome/controller/MainController.java` — полный рефакторинг
-- `src/main/resources/fxml/main.fxml` — главное окно = диспетчер
+**Следствие:** исправлено 26 вхождений `\\!` в 7 Java-файлах и 13 вхождений
+               `<\\!--` в main.fxml. Код теперь синтаксически корректен.
+               Валидация XML — пройдена. Баланс фигурных скобок — пройден.
 
-**GoF паттерны:**
-- Facade — все окна работают через SmartHomeFacade
-- Observer — ViewWindow и DeviceWindow подписаны на EventBus
-- Command — toggle в DeviceWindow идёт через CommandHistory
+**Исправленные файлы:**
+- `src/main/java/com/smarthome/view/component/Room3DView.java`
+- `src/main/java/com/smarthome/view/component/AnimationFactory.java`
+- `src/main/java/com/smarthome/view/window/LogWindow.java`
+- `src/main/java/com/smarthome/view/window/AutomationWindow.java`
+- `src/main/java/com/smarthome/view/window/ViewWindow.java`
+- `src/main/java/com/smarthome/view/window/DeviceWindow.java`
+- `src/main/java/com/smarthome/controller/MainController.java`
+- `src/main/resources/fxml/main.fxml`
 
-## Очередь
-- [x] ШАГ 1–7 выполнены
-- [x] ШАГ 8 — Полноценный мультиоконный режим
+## Статус проекта
+- [x] ШАГ 1 — OBJ-загрузчик (TriangleMesh)
+- [x] ШАГ 2 — FPS-движение (инерция, коллизии, боббинг)
+- [x] ШАГ 3 — Смена темы (Strategy + Singleton)
+- [x] ШАГ 4 — Мультиоконный интерфейс (AutomationWindow, DeviceDetailWindow, LogWindow)
+- [x] ШАГ 5 — Текстуры комнат (RoomTextureFactory, процедурные)
+- [x] ШАГ 6 — Анимации (AnimationFactory)
+- [x] ШАГ 7 — Финальный отчёт
+- [x] ШАГ 8 — Расширенный мультиоконный режим (ViewWindow, DeviceWindow)
+- [x] ШАГ 9 — Исправление синтаксических ошибок (\\! и FXML)

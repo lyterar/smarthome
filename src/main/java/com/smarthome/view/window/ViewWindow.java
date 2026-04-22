@@ -158,7 +158,7 @@ public class ViewWindow {
     /** Вызывается из MainController при выборе комнаты. */
     public void setCurrentRoom(Room room) {
         this.currentRoom = room;
-        if (room \!= null) room3DView.highlightRoom(room);
+        if (room != null) room3DView.highlightRoom(room);
     }
 
     /** Вызывается при toggle устройства — запускает анимацию. */
@@ -172,7 +172,7 @@ public class ViewWindow {
     }
 
     private void refresh() {
-        if (\!room3DView.isFpsMode()) room3DView.drawHouse(facade.getHouse());
+        if (!room3DView.isFpsMode()) room3DView.drawHouse(facade.getHouse());
         if (roomCanvas.isVisible())  roomCanvas.drawHouse(facade.getHouse());
     }
 

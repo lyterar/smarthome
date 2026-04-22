@@ -9,19 +9,19 @@
             stylesheets="@../css/theme-dark.css"
             prefWidth="320" prefHeight="700">
 
-    <\!-- Главное окно = диспетчер. Каждая функция — в своём окне. -->
+    <!-- Главное окно = диспетчер. Каждая функция — в своём окне. -->
 
     <left>
         <VBox prefWidth="300" styleClass="side-panel" spacing="8">
             <padding><Insets top="14" right="14" bottom="14" left="14"/></padding>
 
-            <\!-- Заголовок -->
+            <!-- Заголовок -->
             <Label text="УМНЫЙ ДОМ" styleClass="app-title"/>
             <Label text="Главное меню" style="-fx-text-fill:#64748b; -fx-font-size:12px;"/>
 
             <Separator/>
 
-            <\!-- ══ КОМНАТЫ ══ -->
+            <!-- ══ КОМНАТЫ ══ -->
             <Label text="Комнаты" styleClass="panel-title"/>
             <ListView fx:id="roomListView" prefHeight="220" styleClass="dark-list"/>
 
@@ -33,30 +33,30 @@
 
             <Separator/>
 
-            <\!-- ══ ОКНА — кнопки открытия ══ -->
+            <!-- ══ ОКНА — кнопки открытия ══ -->
             <Label text="Окна" styleClass="panel-title"/>
             <Label text="Каждое окно — отдельная задача"
                    style="-fx-text-fill:#475569; -fx-font-size:11px;"/>
 
-            <\!-- Вид (2D/3D/FPS) -->
+            <!-- Вид (2D/3D/FPS) -->
             <Button text="🖥  Открыть вид  (2D / 3D / FPS)"
                     onAction="#onOpenViewWindow"
                     styleClass="btn-secondary"
                     maxWidth="Infinity"/>
 
-            <\!-- Устройства -->
+            <!-- Устройства -->
             <Button text="💡  Устройства"
                     onAction="#onOpenDeviceWindow"
                     styleClass="btn-secondary"
                     maxWidth="Infinity"/>
 
-            <\!-- Автоматизация -->
+            <!-- Автоматизация -->
             <Button text="⚙️  Автоматизация"
                     onAction="#onOpenAutomationWindow"
                     styleClass="btn-secondary"
                     maxWidth="Infinity"/>
 
-            <\!-- Журнал событий -->
+            <!-- Журнал событий -->
             <Button text="📋  Журнал событий"
                     onAction="#onOpenLogWindow"
                     styleClass="btn-secondary"
@@ -64,7 +64,7 @@
 
             <Separator/>
 
-            <\!-- ══ ИСТОРИЯ КОМАНД ══ -->
+            <!-- ══ ИСТОРИЯ КОМАНД ══ -->
             <HBox spacing="6">
                 <Button fx:id="undoButton" text="↩ Отмена" onAction="#onUndo"
                         HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
@@ -72,7 +72,7 @@
                         HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
             </HBox>
 
-            <\!-- ══ СОХРАНЕНИЕ ══ -->
+            <!-- ══ СОХРАНЕНИЕ ══ -->
             <HBox spacing="6">
                 <Button text="Сохранить" onAction="#onSaveHouse" styleClass="btn-secondary"
                         HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
@@ -82,7 +82,7 @@
 
             <Separator/>
 
-            <\!-- ══ ТЕМА ══ -->
+            <!-- ══ ТЕМА ══ -->
             <Label text="Тема" styleClass="panel-title"/>
             <HBox spacing="4">
                 <Button fx:id="btnThemeDark"  text="Тёмная"  onAction="#onThemeDark"
@@ -93,16 +93,16 @@
                         styleClass="btn-theme"        HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
             </HBox>
 
-            <\!-- Растягивающийся пустой блок — прижимает инфо к низу -->
+            <!-- Растягивающийся пустой блок — прижимает инфо к низу -->
             <Region VBox.vgrow="ALWAYS"/>
 
-            <\!-- ══ ИНФОРМАЦИЯ ══ -->
+            <!-- ══ ИНФОРМАЦИЯ ══ -->
             <Separator/>
             <Label fx:id="houseInfoLabel" text="0 комнат" styleClass="house-info" wrapText="true"/>
         </VBox>
     </left>
 
-    <\!-- Статусная строка -->
+    <!-- Статусная строка -->
     <bottom>
         <HBox styleClass="status-bar" alignment="CENTER_LEFT">
             <padding><Insets top="5" right="10" bottom="5" left="10"/></padding>
